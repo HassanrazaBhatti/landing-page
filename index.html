@@ -11,6 +11,8 @@
     />
     <link rel="stylesheet" href="style.css" />
     <title>FlyFish Adventures</title>
+
+
   </head>
 
   <body>
@@ -187,6 +189,9 @@
         <div class="subscribe-form">
           <input type="email" placeholder="Email address" class="email-input" />
           <button class="subscribe-button">Subscribe</button>
+          <div id="toast" style="display: none;">Message</div>
+          <script src="https://www.gstatic.com/firebasejs/9.16.0/firebase-app.js"></script>
+          <script src="https://www.gstatic.com/firebasejs/9.16.0/firebase-firestore.js"></script>
         </div>
       </section>
 
@@ -249,7 +254,68 @@
     </div>
 
     <br />
-
+    <script src="https://www.gstatic.com/firebasejs/7.22.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.16.0/firebase-firestore.js"></script>    
     <script src="script.js"></script>
+    <script type="module">
+      // Import Firebase SDK
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-app.js";
+      import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-firestore.js";
+  
+      // Your Firebase configuration
+      const firebaseConfig = {
+        apiKey: "AIzaSyB5mQT5XTpaW8JFaQJ9nS-T8sIS66Qfxnw",
+        authDomain: "flyfish-testing.firebaseapp.com",
+        projectId: "flyfish-testing",
+        storageBucket: "flyfish-testing.appspot.com",
+        messagingSenderId: "314575144287",
+        appId: "1:314575144287:web:9f698819dc09d32d4e22ea",
+        measurementId: "G-920K7BN1TB"
+      };
+  
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+  
+      // Toast function
+      function showToast(message, isSuccess) {
+        const toast = document.getElementById("toast");
+        toast.textContent = message;
+        toast.style.backgroundColor = isSuccess ? "green" : "red";
+        toast.style.color = "white";
+        toast.style.padding = "10px";
+        toast.style.borderRadius = "5px";
+        toast.style.position = "fixed";
+        toast.style.bottom = "20px";
+        toast.style.right = "20px";
+        toast.style.display = "block";
+  
+        setTimeout(() => {
+          toast.style.display = "none";
+        }, 3000);
+      }
+  
+      // Add event listener to the button
+      document.querySelector(".subscribe-button").addEventListener("click", async () => {
+        const emailInput = document.querySelector(".email-input");
+        const email = emailInput.value.trim();
+  
+        // Validate email
+        if (!email || !email.includes("@")) {
+          showToast("Invalid email address", false);
+          return;
+        }
+  
+        try {
+          // Add the email to Firestore
+          await addDoc(collection(db, "subscribers"), { email });
+          showToast("Email added successfully!", true);
+          emailInput.value = ""; // Clear the input field
+        } catch (error) {
+          console.error("Error adding email: ", error);
+          showToast("Failed to add email", false);
+        }
+      });
+    </script>
   </body>
 </html>
